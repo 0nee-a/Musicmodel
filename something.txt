@@ -11,12 +11,6 @@
  a.Looped = true
 a:Play()
  
-b = game:GetService("Lighting").ColorGrading
-b:Destroy()
-
-
-
-
                 -- Bloom Effect
                 local Bloom = Instance.new("BloomEffect")
                 Bloom.Intensity = 0.1
@@ -107,5 +101,6 @@ b:Destroy()
                 L.ShadowSoftness = 0
                 L.Ambient = Color3.fromRGB(59, 33, 27)
                 
-                
+                b = game:GetService("Lighting").ColorGrading
+b:Destroy()
            
