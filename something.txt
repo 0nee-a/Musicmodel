@@ -11,8 +11,6 @@
  a.Looped = true
 a:Play()
  
- wait(1)
- 
 b = game:GetService("Lighting").ColorGrading
 b:Destroy()
 
