@@ -29,34 +29,44 @@ function Callback(answer)
         Sound:Play()
         
     
-        game.Players.LocalPlayer.Character:BreakJoints()
-   game.Players.LocalPlayer.Character=nil
-   Connection = game.Workspace.DescendantAdded:Connect(function(c)
-       if c.Name == "Animate" then
-           c.Disabled=true        
-       end
-   end)
-   repeat wait() until game.Players.LocalPlayer.Character
-   Char = game.Players.LocalPlayer.Character
-   Died = game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Died:Connect(function()
-       Connection:Disconnect()
-       Died:Disconnect()
-   end)
-   wait(.1)
-   function waitForChild(parent, childName)
-local child = parent:findFirstChild(childName)
+-- https://scriptblox.com/script/Waterpark-Old-Animations-7547
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Char2 = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local h = Char2:FindFirstChildOfClass("Humanoid") or Char2:WaitForChild("Humanoid")
+
+if h.RigType ~= Enum.HumanoidRigType.R6 then return end
+
+LocalPlayer.Character:BreakJoints()
+LocalPlayer.Character=nil
+repeat task.wait() until LocalPlayer.Character
+Char = LocalPlayer.Character
+task.wait(.1)
+LocalPlayer.Character:BreakJoints()
+       
+LocalPlayer.CharacterAdded:Connect(function(c)
+Char = c
+function waitForChild(parent, childName)
+local child = parent:FindFirstChild(childName)
 if child then return child end
 while true do
- child = parent.ChildAdded:wait()
- if child.Name==childName then return child end
+child = parent.ChildAdded:Wait()
+if child.Name == childName then return child end
 end
 end
+
+waitForChild(Char, "Animate").Disabled = true
+
+task.wait(1)
 
 -- ANIMATION
 
 -- declarations
 
-local Figure = game.Players.LocalPlayer.Character
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Figure = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local Torso = waitForChild(Figure, "Torso")
 local RightShoulder = waitForChild(Torso, "Right Shoulder")
 local LeftShoulder = waitForChild(Torso, "Left Shoulder")
@@ -75,9 +85,9 @@ local jumpMaxLimbVelocity = 0.75
 
 function onRunning(speed)
 if speed>0 then
- pose = "Running"
+pose = "Running"
 else
- pose = "Standing"
+pose = "Standing"
 end
 end
 
@@ -115,16 +125,16 @@ end
 
 function onSwimming(speed)
 if speed>0 then
- pose = "Running"
+pose = "Climbing"
 else
- pose = "Standing"
+pose = "Running"
 end
 end
 
 function moveJump()
-RightShoulder.MaxVelocity = jumpMaxLimbVelocity
-LeftShoulder.MaxVelocity = jumpMaxLimbVelocity
- RightShoulder:SetDesiredAngle(3.14)
+RightShoulder.MaxVelocity = 0.5
+LeftShoulder.MaxVelocity = 0.5
+RightShoulder:SetDesiredAngle(3.14)
 LeftShoulder:SetDesiredAngle(-3.14)
 RightHip:SetDesiredAngle(0)
 LeftHip:SetDesiredAngle(0)
@@ -134,8 +144,8 @@ end
 -- same as jump for now
 
 function moveFreeFall()
-RightShoulder.MaxVelocity = jumpMaxLimbVelocity
-LeftShoulder.MaxVelocity = jumpMaxLimbVelocity
+RightShoulder.MaxVelocity = 0.5
+LeftShoulder.MaxVelocity = 0.5
 RightShoulder:SetDesiredAngle(3.14)
 LeftShoulder:SetDesiredAngle(-3.14)
 RightHip:SetDesiredAngle(0)
@@ -143,8 +153,8 @@ LeftHip:SetDesiredAngle(0)
 end
 
 function moveSit()
-RightShoulder.MaxVelocity = 0.15
-LeftShoulder.MaxVelocity = 0.15
+RightShoulder.MaxVelocity = 0.5
+LeftShoulder.MaxVelocity = 0.5
 RightShoulder:SetDesiredAngle(3.14 /2)
 LeftShoulder:SetDesiredAngle(-3.14 /2)
 RightHip:SetDesiredAngle(3.14 /2)
@@ -153,16 +163,16 @@ end
 
 function getTool()
 for _, kid in ipairs(Figure:GetChildren()) do
- if kid.className == "Tool" then return kid end
+if kid.className == "Tool" then return kid end
 end
 return nil
 end
 
 function getToolAnim(tool)
 for _, c in ipairs(tool:GetChildren()) do
- if c.Name == "toolanim" and c.className == "StringValue" then
-  return c
- end
+if c.Name == "toolanim" and c.className == "StringValue" then
+return c
+end
 end
 return nil
 end
@@ -170,72 +180,64 @@ end
 function animateTool()
 
 if (toolAnim == "None") then
- RightShoulder:SetDesiredAngle(1.57)
- return
+RightShoulder:SetDesiredAngle(1.57)
+return
 end
 
 if (toolAnim == "Slash") then
- RightShoulder.MaxVelocity = 0.5
- RightShoulder:SetDesiredAngle(0)
- return
+RightShoulder.MaxVelocity = 0.5
+RightShoulder:SetDesiredAngle(0)
+return
 end
 
 if (toolAnim == "Lunge") then
- RightShoulder.MaxVelocity = 0.5
- LeftShoulder.MaxVelocity = 0.5
- RightHip.MaxVelocity = 0.5
- LeftHip.MaxVelocity = 0.5
- RightShoulder:SetDesiredAngle(1.57)
- LeftShoulder:SetDesiredAngle(1.0)
- RightHip:SetDesiredAngle(1.57)
- LeftHip:SetDesiredAngle(1.0)
- return
+RightShoulder.MaxVelocity = 0.5
+LeftShoulder.MaxVelocity = 0.5
+RightHip.MaxVelocity = 0.5
+LeftHip.MaxVelocity = 0.5
+RightShoulder:SetDesiredAngle(1.57)
+LeftShoulder:SetDesiredAngle(1.0)
+RightHip:SetDesiredAngle(1.57)
+LeftHip:SetDesiredAngle(1.0)
+return
 end
 end
 
 function move(time)
 local amplitude
 local frequency
- 
+
 if (pose == "Jumping") then
- moveJump()
- return
+moveJump()
+return
 end
 
 if (pose == "FreeFall") then
- moveFreeFall()
- return
+moveFreeFall()
+return
 end
 
 if (pose == "Seated") then
- moveSit()
- return
+moveSit()
+return
 end
 
 local climbFudge = 0
 
 if (pose == "Running") then
-   if (RightShoulder.CurrentAngle > 1.5 or RightShoulder.CurrentAngle < -1.5) then
-  RightShoulder.MaxVelocity = jumpMaxLimbVelocity
- else  
-  RightShoulder.MaxVelocity = 0.15
- end
- if (LeftShoulder.CurrentAngle > 1.5 or LeftShoulder.CurrentAngle < -1.5) then
-  LeftShoulder.MaxVelocity = jumpMaxLimbVelocity
- else  
-  LeftShoulder.MaxVelocity = 0.15
- end
- amplitude = 1
- frequency = 9
+RightShoulder.MaxVelocity = 0.08
+LeftShoulder.MaxVelocity = 0.08
+amplitude = 0.66
+frequency = 8
 elseif (pose == "Climbing") then
- RightShoulder.MaxVelocity = 0.5
- LeftShoulder.MaxVelocity = 0.5
- amplitude = 1
- frequency = 9
- climbFudge = 3.14
+RightShoulder.MaxVelocity = 0.4
+LeftShoulder.MaxVelocity = 0.4
+amplitude = 0.66
+frequency = 9
+climbFudge = 3.14
 else
- amplitude = 0.1
- frequency = 1
+amplitude = 0.07
+frequency = 1
 end
 
 desiredAngle = amplitude * math.sin(time*frequency)
@@ -250,42 +252,41 @@ local tool = getTool()
 
 if tool then
 
- animStringValueObject = getToolAnim(tool)
+animStringValueObject = getToolAnim(tool)
 
- if animStringValueObject then
-  toolAnim = animStringValueObject.Value
-  -- message recieved, delete StringValue
-  animStringValueObject.Parent = nil
-  toolAnimTime = time + .3
- end
+if animStringValueObject then
+toolAnim = animStringValueObject.Value
+-- message recieved, delete StringValue
+animStringValueObject.Parent = nil
+toolAnimTime = time + .3
+end
 
- if time > toolAnimTime then
-  toolAnimTime = 0
-  toolAnim = "None"
- end
+if time > toolAnimTime then
+toolAnimTime = 0
+toolAnim = "None"
+end
 
- animateTool()
+animateTool()
 
-        
 else
- toolAnim = "None"
- toolAnimTime = 0
+toolAnim = "None"
+toolAnimTime = 0
 end
 end
 
 
 -- connect events
 
-Humanoid.Died:connect(onDied)
-Humanoid.Running:connect(onRunning)
-Humanoid.Jumping:connect(onJumping)
-Humanoid.Climbing:connect(onClimbing)
-Humanoid.GettingUp:connect(onGettingUp)
-Humanoid.FreeFalling:connect(onFreeFall)
-Humanoid.FallingDown:connect(onFallingDown)
-Humanoid.Seated:connect(onSeated)
-Humanoid.PlatformStanding:connect(onPlatformStanding)
-Humanoid.Swimming:connect(onSwimming)
+Humanoid.Died:Connect(onDied)
+Humanoid.Running:Connect(onRunning)
+Humanoid.Jumping:Connect(onJumping)
+Humanoid.Climbing:Connect(onClimbing)
+Humanoid.GettingUp:Connect(onGettingUp)
+Humanoid.FreeFalling:Connect(onFreeFall)
+Humanoid.FallingDown:Connect(onFallingDown)
+Humanoid.Seated:Connect(onSeated)
+Humanoid.PlatformStanding:Connect(onPlatformStanding)
+Humanoid.Swimming:Connect(onSwimming)
 -- main program
 
 local runService = game:service("RunService");
@@ -294,8 +295,7 @@ while Figure.Parent~=nil do
 local _, time = wait(0.1)
 move(time)
 end
-
-
+end)
 
     elseif answer == "No" then
         print("Done")
