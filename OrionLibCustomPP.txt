@@ -625,7 +625,7 @@ function OrionLib:MakeWindow(WindowConfig)
 			}), {
 				AddThemeObject(MakeElement("Stroke"), "Stroke"),
 				AddThemeObject(SetProps(MakeElement("Frame"), {
-					Size = UDim2.new(0, 1, 1, 0),
+					Size = UDim2.new(0, 0.001, 0.001, 0),
 					Position = UDim2.new(0.5, 0, 0, 0)
 				}), "Stroke"), 
 				MinimizeBtn,
